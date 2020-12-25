@@ -1,0 +1,64 @@
+//// -- LEVEL 1
+//// -- Tables and References
+
+// Creating tables
+Table users as U {
+  id uuid [pk, unique]
+  username varchar [unique, not null]
+  first_name varchar
+  last_name varchar
+  email email [unique, not null]
+  profile_description text
+  profile_image blob
+  date_of_birth datetime
+  active boolean
+  password password
+  updated_at timestamp
+  created_at timestamp
+}
+
+Table posts as P {
+  id uuid [pk]
+  title varchar [not null]
+  content varchar [not null]
+  user_id uuid
+ }
+ 
+Ref: U.id < P.user_id
+
+Table likes as PL {
+  id uuid [pk]
+  post_id uuid
+  user_id uuid
+  
+}
+
+Ref: P.id < PL.post_id
+Ref: U.id < PL.user_id
+
+Table comments as C{
+  id uuid [pk]
+  post_id uuid
+  user_id uuid
+  
+}
+
+Ref: C.user_id > U.id
+Ref: C.post_id > P.id
+
+Table followers as F{
+  id uuid [pk]
+  from_user_id uuid
+  to_user_id uuid
+  status enum('PENDING','ACCEPTED','REJECTED', 'CANCELLED')
+  updated_at timestamp
+  created_at timestamp
+  
+  indexes{
+    (from_user_id,to_user_id) [unique]
+  }
+  
+}
+
+Ref: F.from_user_id > U.id
+Ref: F.to_user_id > U.id 
