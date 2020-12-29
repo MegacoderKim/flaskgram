@@ -1,5 +1,5 @@
 # WARNING: this file is not suitable for production, please use with caution
-version: '3'
+version: "3"
 
 services:
   web:
@@ -13,5 +13,6 @@ services:
     volumes:
       - ./socio:/code/socio
       - ./db/:/db/
+      - ./migrations:/code/migrations
     ports:
       - "5000:5000"

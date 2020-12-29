@@ -89,3 +89,5 @@ ENV/
 .ropeproject
 # sqlite
 db/
+
+.vscode

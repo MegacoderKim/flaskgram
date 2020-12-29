@@ -33,11 +33,13 @@ def db(app):
 
 
 @pytest.fixture
-def admin_user(db):
+def auth_user(db):
     user = User(
         username='admin',
         email='admin@admin.com',
-        password='admin'
+        password='admin',
+        first_name="admin",
+        last_name="flaskadmin"
     )
 
     db.session.add(user)
@@ -47,9 +49,16 @@ def admin_user(db):
 
 
 @pytest.fixture
-def admin_headers(admin_user, client):
+def anonymous_headers(client):
+    return {
+        'content-type': 'application/json'
+    }
+
+
+@pytest.fixture
+def user_headers(auth_user, client):
     data = {
-        'username': admin_user.username,
+        'username': auth_user.username,
         'password': 'admin'
     }
     rep = client.post(
@@ -66,9 +75,9 @@ def admin_headers(admin_user, client):
 
 
 @pytest.fixture
-def admin_refresh_headers(admin_user, client):
+def user_refresh_headers(auth_user, client):
     data = {
-        'username': admin_user.username,
+        'username': auth_user.username,
         'password': 'admin'
     }
     rep = client.post(

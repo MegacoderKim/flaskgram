@@ -1,13 +1,13 @@
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from socio.api.schemas import UserSchema
-from socio.models import User
+from socio.api.schemas import FollowerSchema
+from socio.models import Follower
 from socio.extensions import db
 from socio.commons.pagination import paginate
 
 
-class UserResource(Resource):
+class FollowerResource(Resource):
     """Single object resource
 
     ---
@@ -16,7 +16,7 @@ class UserResource(Resource):
         - api
       parameters:
         - in: path
-          name: user_id
+          name: follower_id
           schema:
             type: integer
       responses:
@@ -26,22 +26,22 @@ class UserResource(Resource):
               schema:
                 type: object
                 properties:
-                  user: UserSchema
+                  follower: FollowerSchema
         404:
-          description: user does not exists
+          description: follower does not exists
     put:
       tags:
         - api
       parameters:
         - in: path
-          name: user_id
+          name: follower_id
           schema:
             type: integer
       requestBody:
         content:
           application/json:
             schema:
-              UserSchema
+              FollowerSchema
       responses:
         200:
           content:
@@ -51,10 +51,10 @@ class UserResource(Resource):
                 properties:
                   msg:
                     type: string
-                    example: user updated
-                  user: UserSchema
+                    example: follower updated
+                  follower: FollowerSchema
         404:
-          description: user does not exists
+          description: follower does not exists
     delete:
       tags:
         - api
@@ -79,19 +79,19 @@ class UserResource(Resource):
 
     method_decorators = [jwt_required]
 
-    def get(self, user_id):
-        schema = UserSchema()
-        user = User.query.get_or_404(user_id)
-        return {"user": schema.dump(user)}
+    def get(self, follower_id):
+        schema = FollowerSchema()
+        user = Follower.query.get_or_404(follower_id)
+        return {"follower": schema.dump(user)}
 
-    def put(self, user_id):
-        schema = UserSchema(partial=True)
-        user = User.query.get_or_404(user_id)
-        user = schema.load(request.json, instance=user)
+    def put(self, follower_id):
+        schema = FollowerSchema(partial=True)
+        follower = Follower.query.get_or_404(follower_id)
+        follower = schema.load(request.json, instance=follower)
 
         db.session.commit()
 
-        return {"msg": "user updated", "user": schema.dump(user)}
+        return {"msg": "follower updated", "follower": schema.dump(follower)}
 
     def delete(self, user_id):
         user = User.query.get_or_404(user_id)
@@ -99,37 +99,3 @@ class UserResource(Resource):
         db.session.commit()
 
         return {"msg": "user deleted"}
-
-
-class UserCreate(Resource):
-    """Creation by user registering themselves
-    ---
-    post:
-      tags:
-        - api
-      requestBody:
-        content:
-          application/json:
-            schema:
-              UserSchema
-      responses:
-        201:
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: user created
-                  user: UserSchema
-    """
-
-    def post(self):
-        schema = UserSchema()
-        user = schema.load(request.json)
-
-        db.session.add(user)
-        db.session.commit()
-
-        return {"msg": "user created", "user": schema.dump(user)}, 201

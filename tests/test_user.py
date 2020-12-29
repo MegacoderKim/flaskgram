@@ -4,10 +4,10 @@ from socio.extensions import pwd_context
 from socio.models import User
 
 
-def test_get_user(client, db, user, admin_headers):
+def test_get_user(client, db, user, user_headers):
     # test 404
     user_url = url_for('api.user_by_id', user_id="100000")
-    rep = client.get(user_url, headers=admin_headers)
+    rep = client.get(user_url, headers=user_headers)
     assert rep.status_code == 404
 
     db.session.add(user)
@@ -15,7 +15,7 @@ def test_get_user(client, db, user, admin_headers):
 
     # test get_user
     user_url = url_for('api.user_by_id', user_id=user.id)
-    rep = client.get(user_url, headers=admin_headers)
+    rep = client.get(user_url, headers=user_headers)
     assert rep.status_code == 200
 
     data = rep.get_json()["user"]
@@ -24,10 +24,10 @@ def test_get_user(client, db, user, admin_headers):
     assert data["active"] == user.active
 
 
-def test_put_user(client, db, user, admin_headers):
+def test_put_user(client, db, user, user_headers):
     # test 404
     user_url = url_for('api.user_by_id', user_id="100000")
-    rep = client.put(user_url, headers=admin_headers)
+    rep = client.put(user_url, headers=user_headers)
     assert rep.status_code == 404
 
     db.session.add(user)
@@ -37,7 +37,7 @@ def test_put_user(client, db, user, admin_headers):
 
     user_url = url_for('api.user_by_id', user_id=user.id)
     # test update user
-    rep = client.put(user_url, json=data, headers=admin_headers)
+    rep = client.put(user_url, json=data, headers=user_headers)
     assert rep.status_code == 200
 
     data = rep.get_json()["user"]
@@ -49,10 +49,10 @@ def test_put_user(client, db, user, admin_headers):
     assert pwd_context.verify("new_password", user.password)
 
 
-def test_delete_user(client, db, user, admin_headers):
+def test_delete_user(client, db, user, user_headers):
     # test 404
     user_url = url_for('api.user_by_id', user_id="100000")
-    rep = client.delete(user_url, headers=admin_headers)
+    rep = client.delete(user_url, headers=user_headers)
     assert rep.status_code == 404
 
     db.session.add(user)
@@ -61,22 +61,24 @@ def test_delete_user(client, db, user, admin_headers):
     # test get_user
 
     user_url = url_for('api.user_by_id', user_id=user.id)
-    rep = client.delete(user_url,  headers=admin_headers)
+    rep = client.delete(user_url,  headers=user_headers)
     assert rep.status_code == 200
     assert db.session.query(User).filter_by(id=user.id).first() is None
 
 
-def test_create_user(client, db, admin_headers):
+def test_create_user(client, db, anonymous_headers):
     # test bad data
-    users_url = url_for('api.users')
+    users_url = url_for('api.create_user')
     data = {"username": "created"}
-    rep = client.post(users_url, json=data, headers=admin_headers)
+    rep = client.post(users_url, json=data, headers=anonymous_headers)
     assert rep.status_code == 400
 
     data["password"] = "admin"
     data["email"] = "create@mail.com"
+    data["first_name"] = "adminuser"
+    data["last_name"] = "adminstrator"
 
-    rep = client.post(users_url, json=data, headers=admin_headers)
+    rep = client.post(users_url, json=data, headers=anonymous_headers)
     assert rep.status_code == 201
 
     data = rep.get_json()
@@ -86,16 +88,16 @@ def test_create_user(client, db, admin_headers):
     assert user.email == "create@mail.com"
 
 
-def test_get_all_user(client, db, user_factory, admin_headers):
-    users_url = url_for('api.users')
-    users = user_factory.create_batch(30)
+# def test_get_all_user(client, db, user_factory, user_headers):
+#     users_url = url_for('api.users')
+#     users = user_factory.create_batch(30)
 
-    db.session.add_all(users)
-    db.session.commit()
+#     db.session.add_all(users)
+#     db.session.commit()
 
-    rep = client.get(users_url, headers=admin_headers)
-    assert rep.status_code == 200
+#     rep = client.get(users_url, headers=user_headers)
+#     assert rep.status_code == 200
 
-    results = rep.get_json()
-    for user in users:
-        assert any(u["id"] == user.id for u in results["results"])
+#     results = rep.get_json()
+#     for user in users:
+#         assert any(u["id"] == user.id for u in results["results"])

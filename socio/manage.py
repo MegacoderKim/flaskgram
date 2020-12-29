@@ -13,17 +13,17 @@ def cli():
     """Main entry point"""
 
 
-@cli.command("init")
-def init():
-    """Create a new admin user"""
-    from socio.extensions import db
-    from socio.models import User
+# @cli.command("init")
+# def init():
+#     """Create a new admin user"""
+#     from socio.extensions import db
+#     from socio.models import User
 
-    click.echo("create user")
-    user = User(username="admin", email="admin@mail.com", password="admin", active=True)
-    db.session.add(user)
-    db.session.commit()
-    click.echo("created user admin")
+#     click.echo("create user")
+#     user = User(username="admin", email="admin@mail.com", password="admin", active=True)
+#     db.session.add(user)
+#     db.session.commit()
+#     click.echo("created user admin")
 
 
 if __name__ == "__main__":

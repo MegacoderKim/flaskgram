@@ -1,8 +1,8 @@
 .PHONY: init init-migration build run db-migrate test tox
 
 init:  build run
+	docker-compose exec web socio db migrate
 	docker-compose exec web socio db upgrade
-	docker-compose exec web socio init
 	@echo "Init done, containers running"
 
 build:

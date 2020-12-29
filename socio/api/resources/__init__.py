@@ -1,4 +1,5 @@
-from socio.api.resources.user import UserResource, UserList
+from socio.api.resources.user import UserResource, UserCreate
+from socio.api.resources.follower import FollowerResource
 
 
-__all__ = ["UserResource", "UserList"]
+__all__ = ["UserResource", "UserCreate", "FollowerResource"]
