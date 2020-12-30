@@ -56,3 +56,7 @@ def test_put_follower(client, db, user_factory, user_headers):
     assert rep.status_code == 200
     response_data = rep.get_json()["follower"]
     assert response_data["status"] == "accepted"
+
+
+def test_delete_follower(client, db, user_factory, user_headers):
+    pass

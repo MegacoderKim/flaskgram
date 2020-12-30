@@ -32,4 +32,4 @@ class User(db.Model):
         self._password = pwd_context.hash(value)
 
     def __repr__(self):
-        return "<User %s>" % self.username
+        return f"<User {self.username}>"

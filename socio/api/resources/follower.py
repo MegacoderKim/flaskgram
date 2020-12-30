@@ -60,7 +60,7 @@ class FollowerResource(Resource):
         - api
       parameters:
         - in: path
-          name: user_id
+          name: follower_id
           schema:
             type: integer
       responses:
@@ -72,9 +72,9 @@ class FollowerResource(Resource):
                 properties:
                   msg:
                     type: string
-                    example: user deleted
+                    example: follower deleted
         404:
-          description: user does not exists
+          description: follower does not exists
     """
 
     method_decorators = [jwt_required]
@@ -93,9 +93,9 @@ class FollowerResource(Resource):
 
         return {"msg": "follower updated", "follower": schema.dump(follower)}
 
-    def delete(self, user_id):
-        user = User.query.get_or_404(user_id)
-        db.session.delete(user)
+    def delete(self, follower_id):
+        follower = Follower.query.get_or_404(follower_id)
+        db.session.delete(follower)
         db.session.commit()
 
-        return {"msg": "user deleted"}
+        return {"msg": "follower deleted"}

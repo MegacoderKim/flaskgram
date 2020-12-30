@@ -68,7 +68,7 @@ def test_delete_user(client, db, user, user_headers):
 
 def test_create_user(client, db, anonymous_headers):
     # test bad data
-    users_url = url_for('api.create_user')
+    users_url = url_for('api.users')
     data = {"username": "created"}
     rep = client.post(users_url, json=data, headers=anonymous_headers)
     assert rep.status_code == 400
@@ -86,18 +86,20 @@ def test_create_user(client, db, anonymous_headers):
 
     assert user.username == "created"
     assert user.email == "create@mail.com"
+    assert user.first_name == "adminuser"
+    assert user.last_name == "adminstrator"
 
 
-# def test_get_all_user(client, db, user_factory, user_headers):
-#     users_url = url_for('api.users')
-#     users = user_factory.create_batch(30)
+def test_get_all_user(client, db, user_factory, user_headers):
+    users_url = url_for('api.users')
+    users = user_factory.create_batch(30)
 
-#     db.session.add_all(users)
-#     db.session.commit()
+    db.session.add_all(users)
+    db.session.commit()
 
-#     rep = client.get(users_url, headers=user_headers)
-#     assert rep.status_code == 200
+    rep = client.get(users_url, headers=user_headers)
+    assert rep.status_code == 200
 
-#     results = rep.get_json()
-#     for user in users:
-#         assert any(u["id"] == user.id for u in results["results"])
+    results = rep.get_json()
+    for user in users:
+        assert any(u["id"] == user.id for u in results["results"])

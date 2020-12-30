@@ -12,3 +12,10 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         sqla_session = db.session
         load_instance = True
         exclude = ("_password", "created_timestamp", "updated_timestamp")
+
+    _links = ma.Hyperlinks(
+        {
+            "self": ma.URLFor("api.user_by_id", values=dict(user_id="<id>")),
+            "collection": ma.URLFor("api.users"),
+        }
+    )

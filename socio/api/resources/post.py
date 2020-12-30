@@ -1,13 +1,13 @@
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from socio.api.schemas import UserSchema
-from socio.models import User
+from socio.api.schemas import PostSchema
+from socio.models import Post
 from socio.extensions import db
 from socio.commons.pagination import paginate
 
 
-class UserResource(Resource):
+class PostResource(Resource):
     """Single object resource
 
     ---
@@ -16,7 +16,7 @@ class UserResource(Resource):
         - api
       parameters:
         - in: path
-          name: user_id
+          name: post_id
           schema:
             type: integer
       responses:
@@ -26,22 +26,22 @@ class UserResource(Resource):
               schema:
                 type: object
                 properties:
-                  user: UserSchema
+                  user: PostSchema
         404:
-          description: user does not exists
+          description: post does not exists
     put:
       tags:
         - api
       parameters:
         - in: path
-          name: user_id
+          name: post_id
           schema:
             type: integer
       requestBody:
         content:
           application/json:
             schema:
-              UserSchema
+              PostSchema
       responses:
         200:
           content:
@@ -51,16 +51,18 @@ class UserResource(Resource):
                 properties:
                   msg:
                     type: string
-                    example: user updated
-                  user: UserSchema
+                    example: post updated
+                  user: PostSchema
         404:
-          description: user does not exists
+          description: post does not exists
+        400:
+          description: only owner can update post
     delete:
       tags:
         - api
       parameters:
         - in: path
-          name: user_id
+          name: post_id
           schema:
             type: integer
       responses:
@@ -72,36 +74,38 @@ class UserResource(Resource):
                 properties:
                   msg:
                     type: string
-                    example: user deleted
+                    example: post deleted
         404:
-          description: user does not exists
-    """
+          description: post does not exists
 
+    """
     method_decorators = [jwt_required]
 
-    def get(self, user_id):
-        schema = UserSchema()
-        user = User.query.get_or_404(user_id)
-        return {"user": schema.dump(user)}
+    def get(self, post_id):
+        schema = PostSchema()
+        post = Post.query.get_or_404(post_id)
+        return {"post": schema.dump(post)}
 
-    def put(self, user_id):
-        schema = UserSchema(partial=True)
-        user = User.query.get_or_404(user_id)
-        user = schema.load(request.json, instance=user)
-
+    def put(self, post_id):
+        owner = get_jwt_identity()
+        schema = PostSchema(partial=True)
+        post = Post.query.get_or_404(post_id)
+        if post.user_id != owner:
+            return {"msg": "only owner can update post"}, 400
+        post = schema.load(request.json, instance=post)
         db.session.commit()
 
-        return {"msg": "user updated", "user": schema.dump(user)}
+        return {"msg": "post updated", "post": schema.dump(post)}
 
-    def delete(self, user_id):
-        user = User.query.get_or_404(user_id)
-        db.session.delete(user)
+    def delete(self, post_id):
+        post = Post.query.get_or_404(post_id)
+        db.session.delete(post)
         db.session.commit()
 
-        return {"msg": "user deleted"}
+        return {"msg": "post deleted"}
 
 
-class UserList(Resource):
+class PostList(Resource):
     """Creation and get_all
     ---
     get:
@@ -119,7 +123,7 @@ class UserList(Resource):
                       results:
                         type: array
                         items:
-                          $ref: '#/components/schemas/UserSchema'
+                          $ref: '#/components/schemas/PostSchema'
     post:
       tags:
         - api
@@ -127,7 +131,7 @@ class UserList(Resource):
         content:
           application/json:
             schema:
-              UserSchema
+              PostSchema
       responses:
         201:
           content:
@@ -137,21 +141,21 @@ class UserList(Resource):
                 properties:
                   msg:
                     type: string
-                    example: user created
-                  user: UserSchema
+                    example: post created
+                  user: PostSchema
     """
 
-    @jwt_required
+    method_decorators = [jwt_required]
+
     def get(self):
         schema = UserSchema(many=True)
         query = User.query
         return paginate(query, schema)
 
     def post(self):
-        schema = UserSchema()
-        user = schema.load(request.json)
-
-        db.session.add(user)
+        schema = PostSchema()
+        post = schema.load(request.json)
+        db.session.add(post)
         db.session.commit()
 
-        return {"msg": "user created", "user": schema.dump(user)}, 201
+        return {"msg": "post created", "post": schema.dump(post)}, 201
