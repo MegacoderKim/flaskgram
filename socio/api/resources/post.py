@@ -148,8 +148,8 @@ class PostList(Resource):
     method_decorators = [jwt_required]
 
     def get(self):
-        schema = UserSchema(many=True)
-        query = User.query
+        schema = PostSchema(many=True)
+        query = Post.query
         return paginate(query, schema)
 
     def post(self):

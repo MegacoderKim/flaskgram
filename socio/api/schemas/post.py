@@ -11,4 +11,5 @@ class PostSchema(ma.SQLAlchemyAutoSchema):
         model = Post
         sqla_session = db.session
         include_fk = True
+        load_instance = True
         exclude = ("updated_timestamp",)

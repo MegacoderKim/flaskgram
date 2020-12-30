@@ -96,7 +96,7 @@ def test_delete_post(client, db, auth_user, user_headers):
 def test_create_post(client, db, auth_user, user_headers):
     # test bad data
     posts_url = url_for('api.posts')
-    data = {'title': 'new post'}
+    data = {"title": "new post"}
     rep = client.post(posts_url, json=data, headers=user_headers)
     assert rep.status_code == 400
 
@@ -114,4 +114,15 @@ def test_create_post(client, db, auth_user, user_headers):
 
 
 def test_list_posts(client, db, user_factory, user_headers):
-    pass
+    posts_url = url_for('api.posts')
+    users = user_factory.create_batch(5)
+
+    db.session.add_all(users)
+    db.session.commit()
+
+    posts = [Post(user_id=x.id, title=f'Post {x.id}', body=f'Body {x.id}') for x in users]
+    db.session.add_all(posts)
+    db.session.commit()
+
+    rep = client.get(posts_url, headers=user_headers)
+    assert rep.status_code == 200
