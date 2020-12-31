@@ -125,4 +125,14 @@ def test_list_posts(client, db, user_factory, user_headers):
     db.session.commit()
 
     rep = client.get(posts_url, headers=user_headers)
+    results = rep.get_json()
     assert rep.status_code == 200
+    for post in posts:
+        assert any(p["id"] == post.id for p in results["results"])
+
+    # test applying filter
+    post_url_filter = url_for('api.posts', user_id=users[0].id)
+    filtered_post = client.get(post_url_filter, headers=user_headers)
+    results = filtered_post.get_json()
+    assert filtered_post.status_code == 200
+    assert len(results["results"]) == 1

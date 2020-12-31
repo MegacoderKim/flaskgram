@@ -1,6 +1,8 @@
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from webargs import fields
+from webargs.flaskparser import parser
 from socio.api.schemas import PostSchema
 from socio.models import Post
 from socio.extensions import db
@@ -111,6 +113,12 @@ class PostList(Resource):
     get:
       tags:
         - api
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: integer
+          description: The user_id to filter objects
       responses:
         200:
           content:
@@ -147,9 +155,12 @@ class PostList(Resource):
 
     method_decorators = [jwt_required]
 
-    def get(self):
+    @parser.use_args({"user_id": fields.Int()}, location="query")
+    def get(self, args):
         schema = PostSchema(many=True)
         query = Post.query
+        if args:
+            query = Post.query.filter_by(**args)
         return paginate(query, schema)
 
     def post(self):
