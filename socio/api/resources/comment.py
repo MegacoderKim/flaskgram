@@ -3,13 +3,13 @@ from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from webargs import fields
 from webargs.flaskparser import parser
-from socio.api.schemas import PostSchema
-from socio.models import Post
+from socio.api.schemas import CommentSchema
+from socio.models import Comment
 from socio.extensions import db
 from socio.commons.pagination import paginate
 
 
-class PostResource(Resource):
+class CommentResource(Resource):
     """Single object resource
 
     ---
@@ -18,7 +18,7 @@ class PostResource(Resource):
         - api
       parameters:
         - in: path
-          name: post_id
+          name: comment_id
           schema:
             type: integer
       responses:
@@ -28,22 +28,22 @@ class PostResource(Resource):
               schema:
                 type: object
                 properties:
-                  user: PostSchema
+                  comment: CommentSchema
         404:
-          description: post does not exists
+          description: Comment does not exists
     put:
       tags:
         - api
       parameters:
         - in: path
-          name: post_id
+          name: comment_id
           schema:
             type: integer
       requestBody:
         content:
           application/json:
             schema:
-              PostSchema
+              CommentSchema
       responses:
         200:
           content:
@@ -53,18 +53,18 @@ class PostResource(Resource):
                 properties:
                   msg:
                     type: string
-                    example: post updated
-                  user: PostSchema
+                    example: comment updated
+                  comment: CommentSchema
         404:
-          description: post does not exists
+          description: Comment does not exists
         400:
-          description: only owner can update post
+          description: only owner can update Comment
     delete:
       tags:
         - api
       parameters:
         - in: path
-          name: post_id
+          name: comment_id
           schema:
             type: integer
       responses:
@@ -76,38 +76,38 @@ class PostResource(Resource):
                 properties:
                   msg:
                     type: string
-                    example: post deleted
+                    example: Comment deleted
         404:
-          description: post does not exists
+          description: Comment does not exists
 
     """
     method_decorators = [jwt_required]
 
-    def get(self, post_id):
-        schema = PostSchema()
-        post = Post.query.get_or_404(post_id)
-        return {"post": schema.dump(post)}
+    def get(self, comment_id):
+        schema = CommentSchema()
+        comment = Comment.query.get_or_404(comment_id)
+        return {"comment": schema.dump(comment)}
 
-    def put(self, post_id):
+    def put(self, comment_id):
         owner = get_jwt_identity()
-        schema = PostSchema(partial=True)
-        post = Post.query.get_or_404(post_id)
-        if post.user_id != owner:
-            return {"msg": "only owner can update post"}, 400
-        post = schema.load(request.json, instance=post)
+        schema = CommentSchema(partial=True)
+        comment = Comment.query.get_or_404(comment_id)
+        if comment.user_id != owner:
+            return {"msg": "only owner can update Comment"}, 400
+        comment = schema.load(request.json, instance=Comment)
         db.session.commit()
 
-        return {"msg": "post updated", "post": schema.dump(post)}
+        return {"msg": "Comment updated", "comment": schema.dump(Comment)}
 
-    def delete(self, post_id):
-        post = Post.query.get_or_404(post_id)
-        db.session.delete(post)
+    def delete(self, comment_id):
+        comment = Comment.query.get_or_404(comment_id)
+        db.session.delete(comment)
         db.session.commit()
 
-        return {"msg": "post deleted"}
+        return {"msg": "comment deleted"}
 
 
-class PostList(Resource):
+class CommentList(Resource):
     """Creation and get_all
     ---
     get:
@@ -155,18 +155,18 @@ class PostList(Resource):
 
     method_decorators = [jwt_required]
 
-    @parser.use_args({"user_id": fields.Int()}, location="query")
+    @parser.use_args({"user_id": fields.Int(), "post_id": fields.Int()}, location="query")
     def get(self, args):
-        schema = PostSchema(many=True)
-        query = Post.query
+        schema = CommentSchema(many=True)
+        query = Comment.query
         if args:
-            query = Post.query.filter_by(**args)
+            query = Comment.query.filter_by(**args)
         return paginate(query, schema)
 
     def post(self):
-        schema = PostSchema()
-        post = schema.load(request.json)
-        db.session.add(post)
+        schema = CommentSchema()
+        comment = schema.load(request.json)
+        db.session.add(comment)
         db.session.commit()
 
-        return {"msg": "post created", "post": schema.dump(post)}, 201
+        return {"msg": "Comment created", "comment": schema.dump(Comment)}, 201

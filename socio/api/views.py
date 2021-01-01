@@ -2,8 +2,8 @@ from flask import Blueprint, current_app, jsonify
 from flask_restful import Api
 from marshmallow import ValidationError
 from socio.extensions import apispec
-from socio.api.resources import UserResource, UserList, FollowerResource, PostList, PostResource
-from socio.api.schemas import UserSchema, FollowerSchema, PostSchema
+from socio.api.resources import UserResource, UserList, FollowerResource, PostList, PostResource, CommentList, CommentResource
+from socio.api.schemas import UserSchema, FollowerSchema, PostSchema, CommentSchema
 
 
 blueprint = Blueprint("api", __name__, url_prefix="/api/v1")
@@ -15,6 +15,8 @@ api.add_resource(UserList, "/users", endpoint="users")
 api.add_resource(FollowerResource, "/followers/<int:follower_id>", endpoint="follower_by_id")
 api.add_resource(PostResource, "/posts/<int:post_id>", endpoint="post_by_id")
 api.add_resource(PostList, "/posts", endpoint="posts")
+api.add_resource(CommentResource, "/comments/<int:comment_id>", endpoint="comment_by_id")
+api.add_resource(CommentList, "/comments", endpoint="comments")
 
 
 @blueprint.before_app_first_request
@@ -27,6 +29,9 @@ def register_views():
     apispec.spec.components.schema("PostSchema", schema=PostSchema)
     apispec.spec.path(view=PostResource, app=current_app)
     apispec.spec.path(view=PostList, app=current_app)
+    apispec.spec.components.schema("CommentSchema", schema=CommentSchema)
+    apispec.spec.path(view=CommentResource, app=current_app)
+    apispec.spec.path(view=CommentList, app=current_app)
 
 
 @blueprint.errorhandler(ValidationError)
