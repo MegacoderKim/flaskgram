@@ -3,7 +3,7 @@ from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from webargs import fields
 from webargs.flaskparser import parser
-from socio.api.schemas import PostSchema
+from socio.api.schemas import PostSchema, PostUpdateSchema
 from socio.models import Post
 from socio.extensions import db
 from socio.commons.pagination import paginate
@@ -43,7 +43,7 @@ class PostResource(Resource):
         content:
           application/json:
             schema:
-              PostSchema
+              PostUpdateSchema
       responses:
         200:
           content:
@@ -90,7 +90,7 @@ class PostResource(Resource):
 
     def put(self, post_id):
         owner = get_jwt_identity()
-        schema = PostSchema(partial=True)
+        schema = PostUpdateSchema(partial=True)
         post = Post.query.get_or_404(post_id)
         if post.user_id != owner:
             return {"msg": "only owner can update post"}, 400

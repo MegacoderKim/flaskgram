@@ -3,7 +3,7 @@ from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from webargs import fields
 from webargs.flaskparser import parser
-from socio.api.schemas import CommentSchema
+from socio.api.schemas import CommentSchema, CommentUpdateSchema
 from socio.models import Comment
 from socio.extensions import db
 from socio.commons.pagination import paginate
@@ -43,7 +43,7 @@ class CommentResource(Resource):
         content:
           application/json:
             schema:
-              CommentSchema
+              CommentUpdateSchema
       responses:
         200:
           content:
@@ -90,14 +90,13 @@ class CommentResource(Resource):
 
     def put(self, comment_id):
         owner = get_jwt_identity()
-        schema = CommentSchema(partial=True)
+        schema = CommentUpdateSchema(partial=True)
         comment = Comment.query.get_or_404(comment_id)
         if comment.user_id != owner:
             return {"msg": "only owner can update Comment"}, 400
-        comment = schema.load(request.json, instance=Comment)
+        comment = schema.load(request.json, instance=comment)
         db.session.commit()
-
-        return {"msg": "Comment updated", "comment": schema.dump(Comment)}
+        return {"msg": "comment updated", "comment": schema.dump(comment)}
 
     def delete(self, comment_id):
         comment = Comment.query.get_or_404(comment_id)
@@ -155,7 +154,7 @@ class CommentList(Resource):
 
     method_decorators = [jwt_required]
 
-    @parser.use_args({"user_id": fields.Int(), "post_id": fields.Int()}, location="query")
+    @parser.use_args({"post_id": fields.Int()}, location="query")
     def get(self, args):
         schema = CommentSchema(many=True)
         query = Comment.query
@@ -169,4 +168,4 @@ class CommentList(Resource):
         db.session.add(comment)
         db.session.commit()
 
-        return {"msg": "Comment created", "comment": schema.dump(Comment)}, 201
+        return {"msg": "comment created", "comment": schema.dump(comment)}, 201
