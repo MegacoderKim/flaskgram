@@ -1,7 +1,7 @@
 from datetime import datetime
 import factory
-from socio.models import User, Post, Comment
 from socio.extensions import db
+from socio.models import User, Post, Comment, Like
 
 
 class UserFactory(factory.Factory):
@@ -33,4 +33,14 @@ class CommentFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     class Meta:
         model = Comment
+        sqlalchemy_session = db.session
+
+
+class LikeFactory(factory.alchemy.SQLAlchemyModelFactory):
+    user = factory.SubFactory(UserFactory)
+    post = factory.SubFactory(PostFactory)
+    created_timestamp = factory.LazyFunction(datetime.now)
+
+    class Meta:
+        model = Like
         sqlalchemy_session = db.session

@@ -6,12 +6,16 @@ from socio.models import User
 from socio.app import create_app
 from socio.extensions import db as _db
 from pytest_factoryboy import register
-from tests.factories import UserFactory, PostFactory, CommentFactory
+from tests.factories import (
+    UserFactory, PostFactory,
+    CommentFactory, LikeFactory
+)
 
 
 register(UserFactory)
 register(PostFactory)
 register(CommentFactory)
+register(LikeFactory)
 
 
 @pytest.fixture(scope="session")
