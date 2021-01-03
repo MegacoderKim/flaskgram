@@ -14,6 +14,12 @@ Visit `http://0.0.0.0:5000/swagger-ui` to access the swagger UI to the try out t
 
 Run `make build` to build the containers
 
+## Other Commands
+
+Run `make db-migrate` to make alembic migration after changes on the schema.
+
+Run `make db-upgrade` to persist the migrations to the database.
+
 ## Testing
 
 Run the command `make test`

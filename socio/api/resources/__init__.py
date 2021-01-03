@@ -5,8 +5,12 @@ from socio.api.resources.like import LikeResource, LikeList
 
 
 __all__ = [
-    "UserResource", "UserList",
-    "PostResource", "PostList",
-    "CommentResource", "CommentList",
-    "LikeResource", "LikeList"
+    "UserResource",
+    "UserList",
+    "PostResource",
+    "PostList",
+    "CommentResource",
+    "CommentList",
+    "LikeResource",
+    "LikeList",
 ]

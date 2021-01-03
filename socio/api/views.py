@@ -3,14 +3,16 @@ from flask_restful import Api
 from marshmallow import ValidationError
 from socio.extensions import apispec
 from socio.api.resources import (
-    UserResource, UserList, PostList,
-    PostResource, CommentList, CommentResource,
-    LikeResource, LikeList
+    UserResource,
+    UserList,
+    PostList,
+    PostResource,
+    CommentList,
+    CommentResource,
+    LikeResource,
+    LikeList,
 )
-from socio.api.schemas import (
-    UserSchema, PostSchema,
-    CommentSchema, LikeSchema
-)
+from socio.api.schemas import UserSchema, PostSchema, CommentSchema, LikeSchema
 
 
 blueprint = Blueprint("api", __name__, url_prefix="/api/v1")
@@ -21,7 +23,9 @@ api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user_by_id")
 api.add_resource(UserList, "/users", endpoint="users")
 api.add_resource(PostResource, "/posts/<int:post_id>", endpoint="post_by_id")
 api.add_resource(PostList, "/posts", endpoint="posts")
-api.add_resource(CommentResource, "/comments/<int:comment_id>", endpoint="comment_by_id")
+api.add_resource(
+    CommentResource, "/comments/<int:comment_id>", endpoint="comment_by_id"
+)
 api.add_resource(CommentList, "/comments", endpoint="comments")
 api.add_resource(LikeResource, "/likes/<int:like_id>", endpoint="like_by_id")
 api.add_resource(LikeList, "/likes", endpoint="likes")

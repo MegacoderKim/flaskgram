@@ -1,9 +1,9 @@
 from flask import request
 from flask_restful import Resource
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from webargs import fields
 from webargs.flaskparser import parser
-from socio.api.schemas import LikeSchema, LikeUpdateSchema
+from socio.api.schemas import LikeSchema
 from socio.models import Like
 from socio.extensions import db
 from socio.commons.pagination import paginate
@@ -81,6 +81,7 @@ class LikeResource(Resource):
           description: like does not exists
 
     """
+
     method_decorators = [jwt_required]
 
     def get(self, like_id):

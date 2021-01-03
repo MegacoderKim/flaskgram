@@ -6,10 +6,7 @@ from socio.models import User
 from socio.app import create_app
 from socio.extensions import db as _db
 from pytest_factoryboy import register
-from tests.factories import (
-    UserFactory, PostFactory,
-    CommentFactory, LikeFactory
-)
+from tests.factories import UserFactory, PostFactory, CommentFactory, LikeFactory
 
 
 register(UserFactory)
@@ -41,11 +38,11 @@ def db(app):
 @pytest.fixture
 def auth_user(db):
     user = User(
-        username='admin',
-        email='admin@admin.com',
-        password='admin',
+        username="admin",
+        email="admin@admin.com",
+        password="admin",
         first_name="admin",
-        last_name="flaskadmin"
+        last_name="flaskadmin",
     )
 
     db.session.add(user)
@@ -56,44 +53,36 @@ def auth_user(db):
 
 @pytest.fixture
 def anonymous_headers(client):
-    return {
-        'content-type': 'application/json'
-    }
+    return {"content-type": "application/json"}
 
 
 @pytest.fixture
 def user_headers(auth_user, client):
-    data = {
-        'username': auth_user.username,
-        'password': 'admin'
-    }
+    data = {"username": auth_user.username, "password": "admin"}
     rep = client.post(
-        '/auth/login',
+        "/auth/login",
         data=json.dumps(data),
-        headers={'content-type': 'application/json'}
+        headers={"content-type": "application/json"},
     )
 
     tokens = json.loads(rep.get_data(as_text=True))
     return {
-        'content-type': 'application/json',
-        'authorization': 'Bearer %s' % tokens['access_token']
+        "content-type": "application/json",
+        "authorization": "Bearer %s" % tokens["access_token"],
     }
 
 
 @pytest.fixture
 def user_refresh_headers(auth_user, client):
-    data = {
-        'username': auth_user.username,
-        'password': 'admin'
-    }
+    data = {"username": auth_user.username, "password": "admin"}
     rep = client.post(
-        '/auth/login',
+        "/auth/login",
         data=json.dumps(data),
-        headers={'content-type': 'application/json'}
+        headers={"content-type": "application/json"},
     )
 
     tokens = json.loads(rep.get_data(as_text=True))
     return {
-        'content-type': 'application/json',
-        'authorization': 'Bearer %s' % tokens['refresh_token']
+        "content-type": "application/json",
+        "authorization": "Bearer %s" % tokens["refresh_token"],
     }

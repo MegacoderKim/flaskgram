@@ -81,6 +81,7 @@ class CommentResource(Resource):
           description: Comment does not exists
 
     """
+
     method_decorators = [jwt_required]
 
     def get(self, comment_id):

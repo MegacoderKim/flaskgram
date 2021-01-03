@@ -17,11 +17,11 @@ class User(db.Model):
     profile_description = db.Column(db.Text, nullable=True)
     date_of_birth = db.Column(db.Date, nullable=True)
 
-    created_timestamp = db.Column(db.DateTime, nullable=False,
-                                  default=datetime.utcnow)
+    created_timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    updated_timestamp = db.Column(db.DateTime, nullable=False,
-                                  default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_timestamp = db.Column(
+        db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     @hybrid_property
     def password(self):

@@ -81,6 +81,7 @@ class PostResource(Resource):
           description: post does not exists
 
     """
+
     method_decorators = [jwt_required]
 
     def get(self, post_id):
